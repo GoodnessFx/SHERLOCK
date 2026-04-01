@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHERLOCK | Autonomous Prediction Intelligence</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Three.js r128 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #000000;
+            --primary-green: #00FF41;
+            --accent-amber: #F59E0B;
+            --text-white: #FFFFFF;
+            --grid-opacity: 0.03;
+            --scanline-opacity: 0.02;
+            --glass-bg: rgba(0, 255, 65, 0.03);
+            --glass-border: rgba(245, 158, 11, 0.3);
+            --font-mono: 'Space Mono', monospace;
+            --font-syne: 'Syne', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-white);
+            font-family: var(--font-mono);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Scanline Texture Overlay */
+        body::before {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 1000;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+            opacity: var(--scanline-opacity);
+        }
+
+        /* Geometric Grid Overlay */
+        #grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(var(--primary-green) 1px, transparent 1px),
+                linear-gradient(90deg, var(--primary-green) 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: var(--grid-opacity);
+            z-index: 1;
+            pointer-events: none;
+            animation: gridPulse 10s infinite alternate;
+        }
+
+        @keyframes gridPulse {
+            from { opacity: var(--grid-opacity); transform: scale(1); }
+            to { opacity: 0.05; transform: scale(1.05); }
+        }
+
+        /* Three.js Background */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        /* UI Content */
+        #app {
+            position: relative;
+            z-index: 10;
+            padding: 2rem;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* Sections */
+        section {
+            margin-bottom: 4rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Hero Header */
+        .hero {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding-top: 4rem;
+            position: relative;
+        }
+
+        .hero h1 {
+            font-family: var(--font-syne);
+            font-size: clamp(60px, 10vw, 120px);
+            font-weight: 800;
+            line-height: 0.9;
+            letter-spacing: -4px;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        .hero .subtitle {
+            font-size: 1.2rem;
+            color: var(--primary-green);
+            margin-bottom: 2rem;
+            max-width: 600px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .status-bar {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            margin-bottom: 3rem;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: bold;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            background-color: var(--primary-green);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--primary-green);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; box-shadow: 0 0 10px var(--primary-green); }
+            50% { opacity: 0.4; box-shadow: 0 0 20px var(--primary-green); }
+            100% { opacity: 1; box-shadow: 0 0 10px var(--primary-green); }
+        }
+
+        .cta-group {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            background: transparent;
+            border: 1px solid var(--primary-green);
+            color: var(--primary-green);
+            font-family: var(--font-mono);
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            background: var(--primary-green);
+            color: var(--bg-color);
+            box-shadow: 0 0 20px var(--primary-green);
+        }
+
+        .btn-amber {
+            border-color: var(--accent-amber);
+            color: var(--accent-amber);
+        }
+
+        .btn-amber:hover {
+            background: var(--accent-amber);
+            color: var(--bg-color);
+            box-shadow: 0 0 20px var(--accent-amber);
+        }
+
+        /* Layout Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 40% 60%;
+            gap: 2rem;
+        }
+
+        /* Panels */
+        .panel {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            padding: 1.5rem;
+            backdrop-filter: blur(5px);
+            height: 600px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-title {
+            font-family: var(--font-syne);
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            color: var(--primary-green);
+            text-transform: uppercase;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Live Feed Terminal */
+        #terminal-feed {
+            flex-grow: 1;
+            overflow-y: auto;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-green) transparent;
+        }
+
+        #terminal-feed::-webkit-scrollbar { width: 4px; }
+        #terminal-feed::-webkit-scrollbar-track { background: transparent; }
+        #terminal-feed::-webkit-scrollbar-thumb { background: var(--primary-green); }
+
+        .log-entry {
+            margin-bottom: 0.5rem;
+            border-left: 2px solid transparent;
+            padding-left: 0.5rem;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .log-time { color: #666; margin-right: 0.5rem; }
+        .log-type-RUN { color: var(--primary-green); font-weight: bold; }
+        .log-type-EDGE { color: var(--accent-amber); font-weight: bold; }
+        .log-type-SIG { color: #00f2ff; font-weight: bold; }
+        .log-type-ERR { color: #ff4d4d; font-weight: bold; }
+        .log-type-MEM { color: #d400ff; font-weight: bold; }
+
+        /* Edges Panel */
+        #edges-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .edge-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(245, 158, 11, 0.1);
+            padding: 1rem;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .edge-card:hover {
+            border-color: var(--accent-amber);
+            background: rgba(245, 158, 11, 0.05);
+        }
+
+        .edge-priority {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: var(--accent-amber);
+            color: #000;
+            font-size: 0.7rem;
+            font-weight: 800;
+            padding: 0.2rem 0.5rem;
+            text-transform: uppercase;
+        }
+
+        .edge-question {
+            font-size: 1rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            line-height: 1.3;
+        }
+
+        .edge-metrics {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .metric-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+        }
+
+        .metric-label { font-size: 0.7rem; color: #888; text-transform: uppercase; }
+        .metric-value { font-size: 1.2rem; font-weight: bold; }
+        .value-green { color: var(--primary-green); }
+        .value-amber { color: var(--accent-amber); }
+
+        .edge-bar-container {
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            margin: 1rem 0;
+            width: 100%;
+        }
+
+        .edge-bar {
+            height: 100%;
+            background: var(--accent-amber);
+            box-shadow: 0 0 10px var(--accent-amber);
+        }
+
+        /* Track Record */
+        .metrics-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .metric-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.5s ease;
+        }
+
+        .metric-card.updated {
+            box-shadow: 0 0 30px var(--glass-border);
+            border-color: var(--primary-green);
+        }
+
+        .metric-card h3 { font-size: 0.8rem; color: #888; margin-bottom: 0.5rem; text-transform: uppercase; }
+        .metric-card .value { font-size: 2.5rem; font-weight: 800; font-family: var(--font-syne); }
+
+        .charts-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+
+        .chart-container {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            padding: 1.5rem;
+            height: 300px;
+        }
+
+        /* Markets Monitor */
+        .markets-table-container {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            background: rgba(0, 255, 65, 0.05);
+            padding: 1rem;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: var(--primary-green);
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.9rem;
+        }
+
+        tr:hover td {
+            background: rgba(245, 158, 11, 0.05);
+            color: var(--accent-amber);
+        }
+
+        .spike-icon { color: var(--accent-amber); margin-right: 0.5rem; }
+
+        /* Modal */
+        #modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal {
+            background: #000;
+            border: 1px solid var(--accent-amber);
+            padding: 3rem;
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            color: var(--accent-amber);
+            cursor: pointer;
+            font-size: 1.5rem;
+        }
+
+        .wallet-box {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            margin: 1.5rem 0;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            word-break: break-all;
+            border: 1px dashed var(--accent-amber);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 4rem;
+            padding: 2rem 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .footer-stats { display: flex; gap: 2rem; }
+        .footer-stats span { color: var(--primary-green); }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .dashboard-grid { grid-template-columns: 1fr; }
+            .metrics-row { grid-template-columns: repeat(2, 1fr); }
+            .charts-row { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 600px) {
+            #app { padding: 1rem; }
+            .metrics-row { grid-template-columns: 1fr; }
+            .hero h1 { font-size: 50px; }
+            #canvas-container { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div id="grid-overlay"></div>
+    <div id="canvas-container"></div>
+
+    <div id="app">
+        <section class="hero visible">
+            <h1>SHERLOCK</h1>
+            <p class="subtitle">Autonomous prediction intelligence. Running 24/7.</p>
+            
+            <div class="status-bar">
+                <div class="status-indicator">
+                    <div class="dot"></div>
+                    <span id="daemon-status">DAEMON ACTIVE</span>
+                </div>
+                <div>LAST RUN: <span id="last-run-time" style="color: var(--primary-green)">JUST NOW</span></div>
+                <div>RUN COUNT: <span id="run-counter" style="color: var(--primary-green)">0</span></div>
+            </div>
+
+            <div class="cta-group">
+                <a href="https://github.com" target="_blank" class="btn">Deploy Your Own ↗</a>
+                <button class="btn btn-amber" onclick="showModal()">Tip the Swarm ◎</button>
+            </div>
+        </section>
+
+        <section class="dashboard-grid visible" style="transition-delay: 200ms;">
+            <div class="panel">
+                <div class="panel-title">// LIVE AGENT FEED</div>
+                <div id="terminal-feed">
+                    <div class="log-entry">
+                        <span class="log-time">[14:20:01]</span>
+                        <span class="log-type-RUN">[RUN]</span>
+                        <span class="log-msg">Sherlock initialized. Waiting for signals...</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-title">
+                    <span>// LIVE EDGES DETECTED</span>
+                    <span id="edge-count" style="font-size: 0.8rem">0 FOUND</span>
+                </div>
+                <div id="edges-container">
+                    <div style="text-align: center; margin-top: 100px; color: #444;">
+                        Agent is running. Edges will appear here...
+                        <div style="margin-top: 1rem">● ● ●</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="visible" style="transition-delay: 400ms;">
+            <div class="panel-title">// VERIFIED TRACK RECORD</div>
+            <div class="metrics-row">
+                <div class="metric-card">
+                    <h3>Total Predictions</h3>
+                    <div class="value" id="stat-total">0</div>
+                </div>
+                <div class="metric-card">
+                    <h3>Accuracy %</h3>
+                    <div class="value value-green" id="stat-accuracy">0%</div>
+                </div>
+                <div class="metric-card">
+                    <h3>Avg Edge Found</h3>
+                    <div class="value value-amber" id="stat-edge">0%</div>
+                </div>
+                <div class="metric-card">
+                    <h3>Simulated P&L</h3>
+                    <div class="value" id="stat-pnl">$0</div>
+                </div>
+            </div>
+
+            <div class="charts-row">
+                <div class="chart-container">
+                    <canvas id="accuracyChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section class="visible" style="transition-delay: 600ms;">
+            <div class="panel-title">// MARKETS UNDER SURVEILLANCE</div>
+            <div class="markets-table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Question</th>
+                            <th>Yes Price</th>
+                            <th>24h Volume</th>
+                            <th>Our Signal</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="markets-table-body">
+                        <!-- Markets populated via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <footer>
+            <div>Built on the open internet. No fees. No bullshit.</div>
+            <div class="footer-stats">
+                <div>MEMORY: <span id="footer-memory">0B</span></div>
+                <div>SIGNALS: <span id="footer-signals">0</span></div>
+                <div>UPTIME: <span id="footer-uptime">0h 0m</span></div>
+            </div>
+            <div>
+                <a href="#" style="color: inherit; text-decoration: none; margin-left: 1rem;">GITHUB</a>
+                <a href="#" style="color: inherit; text-decoration: none; margin-left: 1rem;">DOCS</a>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Tip Modal -->
+    <div id="modal-overlay" onclick="hideModal()">
+        <div class="modal" onclick="event.stopPropagation()">
+            <div class="modal-close" onclick="hideModal()">&times;</div>
+            <h2 style="font-family: var(--font-syne); color: var(--accent-amber); margin-bottom: 1rem;">SUPPORT THE SWARM</h2>
+            <p style="font-size: 0.9rem; color: #888;">If Sherlock has found edges for you, consider fueling the intelligence engine.</p>
+            
+            <div class="wallet-box">
+                <span id="wallet-addr">7xK...YourSolanaAddressHere</span>
+                <button style="background: none; border: none; color: var(--accent-amber); cursor: pointer;" onclick="copyWallet()">COPY</button>
+            </div>
+            
+            <p style="text-align: center; font-size: 0.8rem; margin: 1rem 0;">USDC or SOL accepted</p>
+            
+            <div style="background: var(--accent-amber); height: 150px; width: 150px; margin: 0 auto; display: flex; align-items: center; justify-content: center; color: #000; font-weight: bold;">
+                QR CODE
+            </div>
+
+            <div style="margin-top: 2rem; text-align: center;">
+                <a href="https://github.com/sponsors" target="_blank" class="btn btn-amber" style="width: 100%;">GitHub Sponsors</a>
+            </div>
+            
+            <p style="text-align: center; font-size: 0.7rem; color: #555; margin-top: 1.5rem;">Every tip ships a new feature.</p>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const API_BASE_URL = window.location.origin;
+        const WS_BASE_URL = window.location.protocol === 'https:' ? `wss://${window.location.host}` : `ws://${window.location.host}`;
+        const SOLANA_WALLET = "7xK...YourSolanaAddressHere";
+
+        // State
+        let socket = null;
+        let reconnectInterval = 5000;
+        let accuracyChart = null;
+        let categoryChart = null;
+
+        // Initialize Three.js
+        function initThree() {
+            if (window.innerWidth < 600) return;
+
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setClearColor(0x000000, 0);
+            document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+            // Globe
+            const geometry = new THREE.IcosahedronGeometry(2, 2);
+            const material = new THREE.MeshBasicMaterial({
+                color: 0x00FF41,
+                wireframe: true,
+                transparent: true,
+                opacity: 0.15
+            });
+            const globe = new THREE.Mesh(geometry, material);
+            scene.add(globe);
+
+            // Particles
+            const particlesGeometry = new THREE.BufferGeometry();
+            const particlesCount = 2000;
+            const posArray = new Float32Array(particlesCount * 3);
+
+            for(let i=0; i < particlesCount * 3; i++) {
+                posArray[i] = (Math.random() - 0.5) * 10;
+            }
+
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            const particlesMaterial = new THREE.PointsMaterial({
+                size: 0.005,
+                color: 0x00FF41,
+                transparent: true,
+                opacity: 0.5
+            });
+            const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+            scene.add(particlesMesh);
+
+            camera.position.z = 5;
+
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                const time = Date.now() * 0.0001;
+                globe.rotation.y += 0.002;
+                globe.rotation.x += 0.001;
+
+                particlesMesh.rotation.y = -time * 0.5;
+
+                // Orbit movement
+                camera.position.x = Math.sin(time) * 0.5;
+                camera.position.y = Math.cos(time) * 0.5;
+                camera.lookAt(scene.position);
+
+                renderer.render(scene, camera);
+            }
+
+            animate();
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        }
+
+        // Initialize Charts
+        function initCharts() {
+            const ctxAcc = document.getElementById('accuracyChart').getContext('2d');
+            accuracyChart = new Chart(ctxAcc, {
+                type: 'line',
+                data: {
+                    labels: ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7'],
+                    datasets: [{
+                        label: 'Accuracy %',
+                        data: [65, 72, 68, 75, 82, 78, 85],
+                        borderColor: '#00FF41',
+                        backgroundColor: 'rgba(0, 255, 65, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#666' } },
+                        x: { grid: { display: false }, ticks: { color: '#666' } }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            const ctxCat = document.getElementById('categoryChart').getContext('2d');
+            categoryChart = new Chart(ctxCat, {
+                type: 'bar',
+                data: {
+                    labels: ['Crypto', 'Politics', 'Sports', 'Weather'],
+                    datasets: [{
+                        data: [12, 19, 3, 5],
+                        backgroundColor: ['#F59E0B', '#F59E0B', '#F59E0B', '#F59E0B'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    scales: {
+                        y: { grid: { display: false }, ticks: { color: '#666' } },
+                        x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#666' } }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        // WebSocket Connectivity
+        function connectWS() {
+            socket = new WebSocket(`${WS_BASE_URL}/live`);
+
+            socket.onopen = () => {
+                console.log("WS Connected");
+                document.getElementById('daemon-status').innerText = "DAEMON ACTIVE";
+                document.getElementById('daemon-status').parentElement.querySelector('.dot').style.backgroundColor = 'var(--primary-green)';
+            };
+
+            socket.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                handleWSMessage(data);
+            };
+
+            socket.onclose = () => {
+                console.log("WS Disconnected");
+                document.getElementById('daemon-status').innerText = "RECONNECTING...";
+                document.getElementById('daemon-status').parentElement.querySelector('.dot').style.backgroundColor = '#ff4d4d';
+                setTimeout(connectWS, reconnectInterval);
+            };
+        }
+
+        function handleWSMessage(msg) {
+            const { type, timestamp, payload } = msg;
+            
+            // Log to terminal
+            addTerminalEntry(timestamp, payload.type || "SYS", payload.message);
+
+            // Update specific UI components based on type
+            if (type === 'log_edge') {
+                updateEdges();
+                triggerFlash();
+            } else if (type === 'log_run' && payload.message.includes('complete')) {
+                refreshData();
+            }
+        }
+
+        function addTerminalEntry(time, type, msg) {
+            const terminal = document.getElementById('terminal-feed');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            
+            const date = new Date(time);
+            const timeStr = `[${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}]`;
+            
+            const typeClass = `log-type-${type}`;
+            const typeLabel = `[${type}]`;
+            
+            entry.innerHTML = `
+                <span class="log-time">${timeStr}</span>
+                <span class="${typeClass}">${typeLabel}</span>
+                <span class="log-msg"></span>
+            `;
+            
+            terminal.prepend(entry);
+            
+            // Typewriter effect
+            const msgSpan = entry.querySelector('.log-msg');
+            let i = 0;
+            const speed = 20;
+            function typeWriter() {
+                if (i < msg.length) {
+                    msgSpan.textContent += msg.charAt(i);
+                    i++;
+                    setTimeout(typeWriter, speed);
+                }
+            }
+            typeWriter();
+            
+            // Limit lines
+            if (terminal.children.length > 100) {
+                terminal.removeChild(terminal.lastChild);
+            }
+        }
+
+        // API Fetchers
+        async function refreshData() {
+            try {
+                const [edgesRes, trackRes, marketsRes, healthRes, feedRes] = await Promise.all([
+                    fetch(`${API_BASE_URL}/api/edges`),
+                    fetch(`${API_BASE_URL}/api/track-record`),
+                    fetch(`${API_BASE_URL}/api/markets`),
+                    fetch(`${API_BASE_URL}/api/health`),
+                    fetch(`${API_BASE_URL}/api/feed`)
+                ]);
+
+                const edges = await edgesRes.json();
+                const track = await trackRes.json();
+                const markets = await marketsRes.json();
+                const health = await healthRes.json();
+                const feed = await feedRes.json();
+
+                updateUI(edges.data, track.data, markets.data, health, feed.data);
+            } catch (e) {
+                console.error("Error refreshing data:", e);
+            }
+        }
+
+        function updateStat(id, value) {
+            const el = document.getElementById(id);
+            if (el.innerText !== String(value)) {
+                el.innerText = value;
+                const card = el.closest('.metric-card');
+                card.classList.add('updated');
+                setTimeout(() => card.classList.remove('updated'), 1000);
+            }
+        }
+
+        function updateUI(edges, track, markets, health, feed) {
+            // Update Stats
+            updateStat('stat-total', track.total_predictions || 0);
+            updateStat('stat-accuracy', `${(track.accuracy_pct || 0).toFixed(1)}%`);
+            updateStat('stat-edge', `${(track.avg_edge * 100 || 0).toFixed(1)}%`);
+            
+            const pnlValue = track.pnl_simulation?.expected_value || 0;
+            updateStat('stat-pnl', `$${pnlValue.toFixed(2)}`);
+            document.getElementById('stat-pnl').style.color = pnlValue >= 0 ? 'var(--primary-green)' : '#ff4d4d';
+
+            // Update Header
+            document.getElementById('run-counter').innerText = health.run_count || 0;
+            document.getElementById('last-run-time').innerText = health.last_run ? new Date(health.last_run).toLocaleTimeString() : "NEVER";
+
+            // Update Footer
+            document.getElementById('footer-memory').innerText = `${(health.memory_size * 0.5).toFixed(1)}KB`;
+            document.getElementById('footer-signals').innerText = (health.run_count * 4) || 0;
+            
+            // Update Edges
+            renderEdges(edges);
+
+            // Update Markets
+            renderMarkets(markets);
+
+            // Update Terminal with history
+            const terminal = document.getElementById('terminal-feed');
+            terminal.innerHTML = '';
+            feed.forEach(log => addTerminalEntry(log.timestamp, log.type, log.message));
+        }
+
+        function renderEdges(edges) {
+            const container = document.getElementById('edges-container');
+            if (!edges || edges.length === 0) return;
+
+            container.innerHTML = '';
+            document.getElementById('edge-count').innerText = `${edges.length} FOUND`;
+
+            edges.forEach(edge => {
+                const card = document.createElement('div');
+                card.className = 'edge-card';
+                const isPriority = Math.abs(edge.edge) > 0.15 && edge.confidence > 0.7;
+                
+                card.innerHTML = `
+                    ${isPriority ? '<div class="edge-priority">PRIORITY</div>' : ''}
+                    <div class="edge-question">${edge.market_question}</div>
+                    <div class="edge-metrics">
+                        <div class="metric-group">
+                            <span class="metric-label">Our Prob</span>
+                            <span class="metric-value value-green">${(edge.our_probability * 100).toFixed(0)}%</span>
+                        </div>
+                        <div class="metric-group">
+                            <span class="metric-label">Market Price</span>
+                            <span class="metric-value">${(edge.market_price * 100).toFixed(0)}%</span>
+                        </div>
+                        <div class="metric-group">
+                            <span class="metric-label">Kelly</span>
+                            <span class="metric-value value-amber">${(edge.kelly_fraction * 100).toFixed(1)}%</span>
+                        </div>
+                    </div>
+                    <div class="edge-bar-container">
+                        <div class="edge-bar" style="width: ${Math.abs(edge.edge * 100)}%; background: ${edge.edge > 0 ? 'var(--primary-green)' : '#ff4d4d'}"></div>
+                    </div>
+                    <div style="font-size: 0.7rem; color: #666; display: flex; gap: 0.5rem;">
+                        ${JSON.parse(edge.signals_used).map(s => `<span>#${s}</span>`).join('')}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function renderMarkets(markets) {
+            const tbody = document.getElementById('markets-table-body');
+            tbody.innerHTML = '';
+
+            markets.forEach(m => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${m.question}</td>
+                    <td>${(m.yes_price * 100).toFixed(0)}¢</td>
+                    <td>$${(m.volume_24h).toLocaleString()}</td>
+                    <td>${m.spike_ratio > 2.0 ? '<span class="spike-icon">⚡</span>SPIKE' : 'STABLE'}</td>
+                    <td style="color: var(--primary-green)">WATCHING</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // UI Helpers
+        function showModal() { document.getElementById('modal-overlay').style.display = 'flex'; }
+        function hideModal() { document.getElementById('modal-overlay').style.display = 'none'; }
+        function copyWallet() {
+            navigator.clipboard.writeText(SOLANA_WALLET);
+            alert("Wallet address copied to clipboard.");
+        }
+
+        function triggerFlash() {
+            const flash = document.createElement('div');
+            flash.style.position = 'fixed';
+            flash.style.top = '0';
+            flash.style.left = '0';
+            flash.style.width = '100%';
+            flash.style.height = '100%';
+            flash.style.background = 'var(--accent-amber)';
+            flash.style.opacity = '0.1';
+            flash.style.zIndex = '5000';
+            flash.style.pointerEvents = 'none';
+            document.body.appendChild(flash);
+            setTimeout(() => flash.remove(), 100);
+        }
+
+        // Initialize Everything
+        window.onload = () => {
+            initThree();
+            initCharts();
+            connectWS();
+            refreshData();
+
+            // Set intersection observer for scroll animations
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) entry.target.classList.add('visible');
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('section').forEach(s => observer.observe(s));
+            
+            // Auto refresh
+            setInterval(refreshData, 60000);
+        };
+    </script>
+</body>
+</html>
