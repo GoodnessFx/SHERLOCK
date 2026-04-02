@@ -48,7 +48,6 @@ async def root():
     return {
         "project": "SHERLOCK",
         "tagline": "The autonomous prediction intelligence network that never sleeps.",
-        "version": "1.0.0",
         "status": "online",
         "api_docs": "/docs"
     }

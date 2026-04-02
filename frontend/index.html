@@ -503,8 +503,8 @@
             </div>
 
             <div class="cta-group">
-                <a href="https://github.com/GoodnessFx/SHERLOCK" target="_blank" class="btn">Deploy Your Own ↗</a>
-                <button class="btn btn-amber" onclick="showModal()">Support SHERLOCK ◎</button>
+                <a href="https://github.com" target="_blank" class="btn">Deploy Your Own ↗</a>
+                <button class="btn btn-amber" onclick="showModal()">Tip the Swarm ◎</button>
             </div>
         </section>
 
@@ -603,11 +603,11 @@
     <div id="modal-overlay" onclick="hideModal()">
         <div class="modal" onclick="event.stopPropagation()">
             <div class="modal-close" onclick="hideModal()">&times;</div>
-            <h2 style="font-family: var(--font-syne); color: var(--accent-amber); margin-bottom: 1rem;">SUPPORT SHERLOCK</h2>
-            <p style="font-size: 0.9rem; color: #888;">If SHERLOCK has found edges for you, consider fueling the intelligence engine.</p>
+            <h2 style="font-family: var(--font-syne); color: var(--accent-amber); margin-bottom: 1rem;">SUPPORT THE SWARM</h2>
+            <p style="font-size: 0.9rem; color: #888;">If Sherlock has found edges for you, consider fueling the intelligence engine.</p>
             
             <div class="wallet-box">
-                <span id="wallet-addr">CHZzepmNUDYPXZpLSE1PQ7rMoRp8nFrfmpeqS41mRAPp</span>
+                <span id="wallet-addr">7xK...YourSolanaAddressHere</span>
                 <button style="background: none; border: none; color: var(--accent-amber); cursor: pointer;" onclick="copyWallet()">COPY</button>
             </div>
             
@@ -618,10 +618,10 @@
             </div>
 
             <div style="margin-top: 2rem; text-align: center;">
-                <a href="https://github.com/sponsors/GoodnessFx" target="_blank" class="btn btn-amber" style="width: 100%;">GitHub Sponsors</a>
+                <a href="https://github.com/sponsors" target="_blank" class="btn btn-amber" style="width: 100%;">GitHub Sponsors</a>
             </div>
             
-            <p style="text-align: center; font-size: 0.7rem; color: #555; margin-top: 1.5rem;">Every support ships a new feature.</p>
+            <p style="text-align: center; font-size: 0.7rem; color: #555; margin-top: 1.5rem;">Every tip ships a new feature.</p>
         </div>
     </div>
 
@@ -629,7 +629,7 @@
         // Configuration
         const API_BASE_URL = window.location.origin;
         const WS_BASE_URL = window.location.protocol === 'https:' ? `wss://${window.location.host}` : `ws://${window.location.host}`;
-        const SOLANA_WALLET = "CHZzepmNUDYPXZpLSE1PQ7rMoRp8nFrfmpeqS41mRAPp";
+        const SOLANA_WALLET = "7xK...YourSolanaAddressHere";
 
         // State
         let socket = null;

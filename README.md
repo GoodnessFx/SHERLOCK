@@ -12,11 +12,11 @@
 ---
 
 ## ⚡ What is this?
-SHERLOCK is not just a bot; it's an advanced network of specialized agents working in concert to find high-probability outcomes on Polymarket.
+SHERLOCK is not just a bot; it's a swarm of specialized agents working in concert to find high-probability outcomes on Polymarket.
 - **Multi-Agent Orchestration:** Uses LangGraph to route tasks between research, probability, and execution agents.
 - **KAIROS Memory:** Persistent local vector store (ChromaDB) that stores every signal, prediction, and outcome to improve over time.
 - **24/7 Daemon:** Runs continuously in a background loop, monitoring markets every 15 minutes.
-- **3D Dashboard:** A "Dark Terminal Luxury" dashboard built with Three.js that broadcasts live activity, confidence scores, and discovered edges.
+- **Stunning 3D Dashboard:** A "Dark Terminal Luxury" dashboard built with Three.js that broadcasts live activity, confidence scores, and discovered edges.
 - **Zero-Fee Open Source:** Fully open source, one-click deployable, and designed to run on free-tier infrastructure.
 
 ---
@@ -36,17 +36,17 @@ SHERLOCK follows a structured agentic workflow for every market it analyzes:
         |                     |
         +----------+----------+
                    |
-         [ PROBABILITY AGENT ]
-         (Claude 3.5 Sonnet
-          Reasoning & Scoring)
+        [ PROBABILITY AGENT ]
+        (Claude 3.5 Sonnet
+         Reasoning & Scoring)
                    |
-          [ EXECUTION AGENT ]
-          (Kelly Criterion &
-           Trade Recommendations)
+        [ EXECUTION AGENT ]
+        (Kelly Criterion &
+         Trade Recommendations)
                    |
-         [ BROADCAST / STORE ]
-         (WS to Dashboard &
-          SQLite Logger)
+        [ BROADCAST / STORE ]
+        (WS to Dashboard &
+         SQLite Logger)
 ```
 
 ---
@@ -102,19 +102,12 @@ SHERLOCK finds edges—the difference between the agent's estimated probability 
 
 ---
 
-## Support SHERLOCK
+## 🎁 Support the Swarm
+If SHERLOCK has helped you find profitable edges, consider tipping the swarm to fuel further development:
+- **Solana Wallet:** `7xK...YourSolanaAddressHere`
+- **GitHub Sponsors:** [Click here](https://github.com/sponsors)
 
-If SHERLOCK finds you an edge, send some back.
-
-**Solana / USDC tips:**
-CHZzepmNUDYPXZpLSE1PQ7rMoRp8nFrfmpeqS41mRAPp
-
-**Other ways to support:**
-- `https://ko-fi.com/GoodnessFx`
-- `https://buymeacoffee.com/GoodnessFx`
-- `https://github.com/sponsors/GoodnessFx`
-
-> Built this free. If it prints for you, send some back. No pressure.
+---
 
 ## 📜 License
 MIT © [Your Name/Project Sherlock]
