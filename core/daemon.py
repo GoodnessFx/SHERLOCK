@@ -48,7 +48,7 @@ class SherlockDaemon:
         Start the APScheduler loop.
         """
         if not validate_config():
-            logger.error("Configuration validation failed. Daemon will not start.")
+            db_logger.log_event("ERROR", "DAEMON", "Configuration validation failed. Daemon will not start.")
             return
 
         db_logger.log_event("INFO", "DAEMON", "SHERLOCK DAEMON starting up...")
@@ -72,13 +72,14 @@ async def main():
 
     # Handle termination signals
     stop_event = asyncio.Event()
-    loop = asyncio.get_running_loop()
     
-    for sig in (signal.SIGINT, signal.SIGTERM):
-        loop.add_signal_handler(sig, stop_event.set)
-
+    # loop.add_signal_handler is not supported on Windows for some event loops
+    # Using a simpler approach for Windows compatibility
     try:
-        await stop_event.wait()
+        while not stop_event.is_set():
+            await asyncio.sleep(1)
+    except (KeyboardInterrupt, SystemExit):
+        pass
     finally:
         daemon.stop()
 

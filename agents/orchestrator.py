@@ -93,7 +93,7 @@ async def store_memory_node(state: AgentState) -> AgentState:
         for edge in state["edges"]:
             # Create a signal object to store the edge finding
             signal = {
-                "source": "SherlockOrchestrator",
+                "source": "SHERLOCK",
                 "type": "prediction",
                 "summary": f"Predicted {edge['our_probability']:.2f} for {edge['market_question']}. Market price: {edge['market_price']:.2f}.",
                 "confidence": edge["confidence"],
