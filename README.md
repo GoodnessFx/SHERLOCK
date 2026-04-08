@@ -1,5 +1,4 @@
-# SHERLOCK
-### The autonomous prediction intelligence network that never sleeps.
+
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-blue.svg)
@@ -7,11 +6,13 @@
 ![Anthropic](https://img.shields.io/badge/Reasoning-Claude_3.5_Sonnet-orange.svg)
 ![Polymarket](https://img.shields.io/badge/Markets-Polymarket_CLOB-purple.svg)
 
-**SHERLOCK** is a fully autonomous, multi-agent AI system designed to dominate prediction markets by identifying exploitable edges 24/7. Built on the LangGraph framework and powered by Claude 3.5 Sonnet, it combines real-time signal processing with a persistent KAIROS memory system to learn and improve from every market it watches.
+**SHERLOCK** is a multi-agent AI for predicting markets by identifying exploitable edges 24/7. 
+
+Built on the LangGraph framework and powered by Claude 3.5 Sonnet, it combines real-time signal processing with a persistent KAIROS memory system to learn and improve from every market it watches.
 
 ---
 
-## ⚡ What is this?
+##  What is this?
 SHERLOCK is not just a bot; it's a swarm of specialized agents working in concert to find high-probability outcomes on Polymarket.
 - **Multi-Agent Orchestration:** Uses LangGraph to route tasks between research, probability, and execution agents, now incorporating advanced Bayesian updating and market-making strategies.
 - **KAIROS Memory:** Persistent local vector store (ChromaDB) that stores every signal, prediction, and outcome to improve over time.
@@ -29,7 +30,7 @@ SHERLOCK is not just a bot; it's a swarm of specialized agents working in concer
 
 ---
 
-## 🧠 How it Works
+##  How it Works
 SHERLOCK follows a structured agentic workflow for every market it analyzes, now enhanced with a multi-layered approach to identify and exploit market inefficiencies:
 
 ```ascii
@@ -92,19 +93,7 @@ The dashboard is a single-file static HTML page that connects to the SHERLOCK AP
 - **Track Record:** Verified accuracy stats and simulated P&L.
 
 ---
-
-## 🛠 Configuration (.env)
-| Variable | Description |
-|----------|-------------|
-| `ANTHROPIC_API_KEY` | Your Claude 3.5 Sonnet key. |
-| `OPENWEATHER_API_KEY` | For weather-based prediction markets. |
-| `NEWS_API_KEY` | For political/news sentiment analysis. |
-| `SOLANA_WALLET_ADDRESS` | Your address for the tip jar widget. |
-| `DAEMON_INTERVAL_MINUTES` | How often the agent runs (default: 15). |
-
----
-
-## 💰 How to Make Money
+## How to Make Money
 SHERLOCK finds edges—the difference between the agent's estimated probability and the current market price.
 1. **Find an Edge:** Monitor the "LIVE EDGES" panel on your dashboard.
 2. **Review Reasoning:** Read the agent's logic for why it thinks the market is mispriced.
@@ -113,12 +102,4 @@ SHERLOCK finds edges—the difference between the agent's estimated probability 
 
 ---
 
-## 🎁 Support the Swarm
-If SHERLOCK has helped you find profitable edges, consider tipping the swarm to fuel further development:
-- **Solana Wallet:** `7xK...YourSolanaAddressHere`
-- **GitHub Sponsors:** [Click here](https://github.com/sponsors)
 
----
-
-## 📜 License
-MIT © [Your Name/Project Sherlock]
