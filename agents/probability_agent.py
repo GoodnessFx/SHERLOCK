@@ -37,11 +37,15 @@ class ProbabilityAgent:
         {json.dumps([{ 'text': m['text'], 'outcome': m['metadata'].get('outcome') } for m in memory_context], indent=2)}
         
         Task:
-        Estimate the probability (0.0 to 1.0) of this market resolving to YES.
-        Compare your estimate to the current market price ({market.get('yes_price')}).
+        You are an expert Bayesian reasoner. Your goal is to estimate the true probability (0.0 to 1.0) of this market resolving to YES, using the current market price as a prior and updating your belief based on the provided signals and historical context.
+
+        Consider the Current YES Price ({market.get('yes_price')}) as your initial prior belief.
+        Then, carefully analyze the 'Available Signals' (including any 'spread_analysis' signals) and 'Historical Memory Context'.
+        Update your probability estimate based on the strength and relevance of this new evidence.
+        Explain how each piece of evidence shifts your belief from the prior.
+
+        Finally, provide your updated probability estimate (our_probability), a confidence score (0.0 to 1.0) in this estimate, and a detailed reasoning for your Bayesian update.
         Calculate the edge (your_probability - market_price).
-        
-        Provide your reasoning and a confidence score (0.0 to 1.0).
         
         Return ONLY a JSON object in this format:
         {{

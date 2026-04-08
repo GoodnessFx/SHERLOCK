@@ -31,6 +31,11 @@ class Settings(BaseSettings):
     MAX_MARKETS_PER_RUN: int = int(os.getenv("MAX_MARKETS_PER_RUN", 20))
     MEMORY_RECALL_COUNT: int = int(os.getenv("MEMORY_RECALL_COUNT", 5))
 
+    # Trading Costs
+    POLYMARKET_FEES_PERCENTAGE: float = float(os.getenv("POLYMARKET_FEES_PERCENTAGE", 0.02)) # 2% fees
+    SLIPPAGE_TOLERANCE_PERCENTAGE: float = float(os.getenv("SLIPPAGE_TOLERANCE_PERCENTAGE", 0.01)) # 1% slippage tolerance
+    MIN_PROFIT_PERCENTAGE: float = float(os.getenv("MIN_PROFIT_PERCENTAGE", 0.01)) # 1% minimum profit after costs
+
     # Database
     SQLITE_DB_PATH: str = os.getenv("SQLITE_DB_PATH", "data/oracle.db")
     CHROMA_DB_PATH: str = os.getenv("CHROMA_DB_PATH", "data/chroma")

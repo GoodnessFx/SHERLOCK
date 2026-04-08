@@ -447,3 +447,35 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
 2026-04-02 07:09:11,550 [INFO] SHERLOCK: [DAEMON] Scheduled run #19 completed successfully.
 2026-04-02 07:09:11,578 [INFO] apscheduler.executors.default: Job "SherlockDaemon.run_task (trigger: interval[0:15:00], next run at: 2026-04-02 07:23:41 WAT)" executed successfully
 2026-04-02 07:23:42,987 [WARNING] apscheduler.executors.default: Run time of job "SherlockDaemon.run_task (trigger: interval[0:15:00], next run at: 2026-04-02 07:38:41 WAT)" was missed by 0:00:01.043292
+2026-04-02 07:37:07,348 [INFO] api.server: Starting up SHERLOCK API...
+2026-04-02 07:37:39,522 [INFO] SHERLOCK: [DAEMON] SHERLOCK DAEMON starting up...
+2026-04-02 07:37:39,526 [INFO] apscheduler.scheduler: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-04-02 07:37:39,528 [INFO] apscheduler.scheduler: Added job "SherlockDaemon.run_task" to job store "default"
+2026-04-02 07:37:39,528 [INFO] apscheduler.scheduler: Scheduler started
+2026-04-02 07:37:39,595 [INFO] SHERLOCK: [DAEMON] Scheduler started. Interval: 15 minutes.
+2026-04-02 07:37:39,597 [ERROR] apscheduler.executors.default: Error running job 3e03553d07d54d44b78c955051aa62a9
+Traceback (most recent call last):
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\asyncio\runners.py", line 195, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\asyncio\runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\asyncio\base_events.py", line 725, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "C:\Users\Admin\Desktop\SHERLOCK\SHERLOCK\core\daemon.py", line 78, in main
+    loop.add_signal_handler(sig, stop_event.set)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\asyncio\events.py", line 596, in add_signal_handler
+    raise NotImplementedError
+NotImplementedError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\apscheduler\executors\asyncio.py", line 35, in callback
+    events = f.result()
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\site-packages\apscheduler\executors\base.py", line 161, in run_coroutine_job
+    async def run_coroutine_job(job, jobstore_alias, run_times, logger_name):
+asyncio.exceptions.CancelledError

@@ -13,8 +13,16 @@
 
 ## ⚡ What is this?
 SHERLOCK is not just a bot; it's a swarm of specialized agents working in concert to find high-probability outcomes on Polymarket.
-- **Multi-Agent Orchestration:** Uses LangGraph to route tasks between research, probability, and execution agents.
+- **Multi-Agent Orchestration:** Uses LangGraph to route tasks between research, probability, and execution agents, now incorporating advanced Bayesian updating and market-making strategies.
 - **KAIROS Memory:** Persistent local vector store (ChromaDB) that stores every signal, prediction, and outcome to improve over time.
+- **Advanced Signal Processing:** Integrates real-time data for weather, crypto, news, on-chain activity, and now includes sophisticated spread analysis, Sentiment AI, and Volatility Monitoring.
+- **6 Layers of Prediction Math:**
+    1. **Bayesian Updating:** Claude 3.5 Sonnet acts as a Bayesian reasoner, using market price as a prior.
+    2. **Expected Value Filtering:** Trades are filtered for net profit after fees and slippage.
+    3. **Spread Analysis:** Detects discrepancies between related markets and platforms.
+    4. **Market-Making Execution:** Sophisticated order management (Layer 4 setup).
+    5. **Sentiment AI:** Real-time social media and news sentiment scanning.
+    6. **Calendar + Volatility:** Exploits price spikes 15-20 minutes before events.
 - **24/7 Daemon:** Runs continuously in a background loop, monitoring markets every 15 minutes.
 - **Stunning 3D Dashboard:** A "Dark Terminal Luxury" dashboard built with Three.js that broadcasts live activity, confidence scores, and discovered edges.
 - **Zero-Fee Open Source:** Fully open source, one-click deployable, and designed to run on free-tier infrastructure.
@@ -22,7 +30,7 @@ SHERLOCK is not just a bot; it's a swarm of specialized agents working in concer
 ---
 
 ## 🧠 How it Works
-SHERLOCK follows a structured agentic workflow for every market it analyzes:
+SHERLOCK follows a structured agentic workflow for every market it analyzes, now enhanced with a multi-layered approach to identify and exploit market inefficiencies:
 
 ```ascii
 [ DAEMON ] -> [ ORCHESTRATOR ]
@@ -32,17 +40,20 @@ SHERLOCK follows a structured agentic workflow for every market it analyzes:
 [ RESEARCH AGENT ]   [ MEMORY AGENT ]
 (Signals: Weather,   (Recall similar
  Crypto, News,       past events from
- On-chain)           ChromaDB)
+ On-chain,           ChromaDB)
+ Spread Analysis)
         |                     |
         +----------+----------+
                    |
         [ PROBABILITY AGENT ]
         (Claude 3.5 Sonnet
-         Reasoning & Scoring)
+         Bayesian Updating &
+         Probability Scoring)
                    |
         [ EXECUTION AGENT ]
-        (Kelly Criterion &
-         Trade Recommendations)
+        (Expected Value Filtering,
+         Kelly Criterion &
+         Market-Making Execution)
                    |
         [ BROADCAST / STORE ]
         (WS to Dashboard &
